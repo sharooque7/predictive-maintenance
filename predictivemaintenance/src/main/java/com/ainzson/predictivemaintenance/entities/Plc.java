@@ -1,16 +1,9 @@
 package com.ainzson.predictivemaintenance.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Table(name = "plc")
@@ -19,28 +12,28 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class Plc {
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID id;
 
-    @Column(name = "plc_name", nullable = false)
+    @Id
+    @Column(name = "plc_id", nullable = false)
+    private UUID plcId;
+
+    @Column(name = "plc_name", nullable = false, length = 100)
     private String plcName;
 
-    @Column(name = "ip_address", nullable = false)
+    @Column(name = "ip_address", nullable = false, length = 45)
     private String ipAddress;
 
-    @Column(name = "protocol", nullable = false)
-    private String protocol;
+    @Column(name = "protocol", nullable = false, length = 20)
+    private String protocol; // values: 'opcua', 'modbus', 'mqtt'
 
-    @Column(name = "location")
+    @Column(name = "location", length = 100)
     private String location;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private Instant updatedAt = Instant.now();
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "plc", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Asset> assets = new ArrayList<>();
