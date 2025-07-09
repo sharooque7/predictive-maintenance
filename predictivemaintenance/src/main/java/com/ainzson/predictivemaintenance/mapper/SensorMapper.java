@@ -8,7 +8,7 @@ public class SensorMapper {
 
     public static Sensor toEntity(SensorDto dto, Asset asset) {
         return Sensor.builder()
-                .id(dto.getId())
+                .sensorId(dto.getId())
                 .sensorType(dto.getSensorType())
                 .unit(dto.getUnit())
                 .signalType(dto.getSignalType())
@@ -20,13 +20,13 @@ public class SensorMapper {
 
     public static SensorDto toDto(Sensor entity) {
         return SensorDto.builder()
-                .id(entity.getId())
+                .id(entity.getSensorId())
                 .sensorType(entity.getSensorType())
                 .unit(entity.getUnit())
                 .signalType(entity.getSignalType())
                 .readingRange(entity.getReadingRange())
                 .tagName(entity.getTagName())
-                .assetId(entity.getAsset().getId())
+                .assetId(entity.getAsset().getAssetId())
                 .build();
     }
 }

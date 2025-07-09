@@ -6,8 +6,7 @@ import com.ainzson.predictivemaintenance.entities.Plc;
 public class PlcMapper {
 
     public static Plc toEntity(PlcDto dto) {
-        return Plc.builder()
-                .id(dto.getId())
+        return Plc.builder().plcId(dto.getId())
                 .plcName(dto.getPlcName())
                 .ipAddress(dto.getIpAddress())
                 .protocol(dto.getProtocol())
@@ -17,7 +16,7 @@ public class PlcMapper {
 
     public static PlcDto toDto(Plc entity) {
         return PlcDto.builder()
-                .id(entity.getId())
+                .id(entity.getPlcId())
                 .plcName(entity.getPlcName())
                 .ipAddress(entity.getIpAddress())
                 .protocol(entity.getProtocol())

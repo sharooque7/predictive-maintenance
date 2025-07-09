@@ -8,7 +8,7 @@ public class AssetMapper {
 
     public static Asset toEntity(AssetDto dto, Plc plc) {
         return Asset.builder()
-                .id(dto.getId())
+                .assetId(dto.getId())
                 .assetName(dto.getAssetName())
                 .type(dto.getType())
                 .location(dto.getLocation())
@@ -18,11 +18,11 @@ public class AssetMapper {
 
     public static AssetDto toDto(Asset entity) {
         return AssetDto.builder()
-                .id(entity.getId())
+                .id(entity.getAssetId())
                 .assetName(entity.getAssetName())
                 .type(entity.getType())
                 .location(entity.getLocation())
-                .plcId(entity.getPlc().getId())
+                .plcId(entity.getPlc().getPlcId())
                 .build();
     }
 }

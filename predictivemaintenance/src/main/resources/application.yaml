@@ -3,7 +3,7 @@ spring:
     name: asset-management-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/predictive_maintenance
+    url: jdbc:postgresql://localhost:5432/predictive
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
