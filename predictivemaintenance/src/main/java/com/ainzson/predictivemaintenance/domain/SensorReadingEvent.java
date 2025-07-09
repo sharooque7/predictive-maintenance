@@ -1,5 +1,6 @@
 package com.ainzson.predictivemaintenance.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,7 +18,6 @@ public class SensorReadingEvent {
     private String unit;
     private String tag;
 
-    // Constructor from SensorProfile
     public SensorReadingEvent(SensorProfile profile, double value, Instant timestamp) {
         this.sensorId = profile.getSensorId();
         this.assetId = profile.getAssetId();

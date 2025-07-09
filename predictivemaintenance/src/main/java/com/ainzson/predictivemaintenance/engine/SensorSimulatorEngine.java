@@ -2,8 +2,11 @@ package com.ainzson.predictivemaintenance.engine;
 
 import com.ainzson.predictivemaintenance.domain.SensorProfile;
 import com.ainzson.predictivemaintenance.domain.SensorReadingEvent;
-import com.ainzson.predictivemaintenance.initializations.SensorProfileCacheLoader;
-import com.ainzson.predictivemaintenance.service.EventPublisher;
+import com.ainzson.predictivemaintenance.service.SensorProfileCacheLoader;
+import com.ainzson.predictivemaintenance.service.publisher.EventPublisherStrategy;
+import com.ainzson.predictivemaintenance.service.publisher.FileEventPublisher;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -20,13 +23,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class SensorSimulatorEngine {
 
     private final SensorProfileCacheLoader cacheLoader;
-    private final EventPublisher eventPublisher;
+    private final EventPublisherStrategy eventPublisher;
     private List<SensorProfile> sensorProfiles;
-
-
     private int threadCount;
     private int intervalSeconds;
     private final ScheduledExecutorService scheduler;
@@ -40,11 +42,11 @@ public class SensorSimulatorEngine {
 
     public SensorSimulatorEngine(
             SensorProfileCacheLoader cacheLoader,
-            EventPublisher eventPublisher,
+            FileEventPublisher fileEventPublisher,
             SensorProfileCacheLoader sensorProfileCacheLoader
     ) {
         this.cacheLoader = cacheLoader;
-        this.eventPublisher = eventPublisher;
+        this.eventPublisher = fileEventPublisher;
         this.threadCount = 0; // Temp placeholder, will be set in initConfig
         this.intervalSeconds = 0;
         this.scheduler = Executors.newScheduledThreadPool(configuredThreadCount);
@@ -61,7 +63,7 @@ public class SensorSimulatorEngine {
 
         for (int i=0; i < profilePartitions.size(); i++) {
             List<SensorProfile> batch = profilePartitions.get(i);
-            System.out.println("🧵 Thread " + (i + 1) + " assigned " + batch.size() + " sensors.");
+            log.info("🧵 Thread " + (i + 1) + " assigned " + batch.size() + " sensors.");
             simulateBatch(batch);
         }
     }
@@ -70,7 +72,7 @@ public class SensorSimulatorEngine {
         // Assign values from @Value fields to actual final fields
         this.threadCount = configuredThreadCount;
         this.intervalSeconds = configuredIntervalSeconds;
-        System.out.println("🟢 SensorSimulatorEngine initialized with " + threadCount + " threads.");
+        log.info("🟢 SensorSimulatorEngine initialized with " + threadCount + " threads.");
 
     }
 
@@ -80,7 +82,7 @@ public class SensorSimulatorEngine {
                 .stream()
                 .collect(Collectors.toList());
 
-        System.out.println("Loaded " + sensorProfiles.size() + " sensor profiles from cache.");
+        log.info("Loaded " + sensorProfiles.size() + " sensor profiles from cache.");
     }
 
     private List<List<SensorProfile>> partitionProfiles(List<SensorProfile> profiles, int partitionSize){
@@ -112,7 +114,11 @@ public class SensorSimulatorEngine {
                         profile.getTagName()
                 );
 
-                eventPublisher.publish(event);
+                try {
+                    eventPublisher.publish(event);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
         }, 0, intervalSeconds, TimeUnit.SECONDS);
